@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "4001:4001"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notifications_dev
+    ports:
+      - "5433:5432"  # Porta externa 5433, interna 5432
+    volumes:
+      - pgdata_notifications:/var/lib/postgresql/data
+
+volumes:
+  pgdata_notifications:
+
+
+networks:
+  default:
+    name: shared_net
+    external: true
