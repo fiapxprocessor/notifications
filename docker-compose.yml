@@ -2,29 +2,37 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
+    image: phoenix:latest
+    build: .
+    command: >
+      /bin/sh -c "iex -S mix phx.server"
+    volumes:
+      - .:/app
     ports:
       - "4001:4001"
     depends_on:
-      - postgres
+      - postgres_notifications
+    networks:
+      - shared_net
 
-  postgres:
+  postgres_notifications:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: notifications_dev
     ports:
-      - "5433:5432"  # Porta externa 5433, interna 5432
+      - "5433:5432"
     volumes:
       - pgdata_notifications:/var/lib/postgresql/data
+    networks:
+      - shared_net
 
 volumes:
   pgdata_notifications:
-
+  pgdata:       
+  shared_storage:       
 
 networks:
-  default:
-    name: shared_net
+  shared_net:
     external: true

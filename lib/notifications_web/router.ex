@@ -20,6 +20,13 @@ defmodule NotificationsWeb.Router do
     get "/", PageController, :home
   end
 
+  scope "/api", NotificationsWeb do
+    pipe_through :api
+
+    post "/webhooks", WebhooksController, :create
+    get "/webhooks", WebhooksController, :index
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", NotificationsWeb do
   #   pipe_through :api
