@@ -15,10 +15,11 @@ defmodule Notifications.Broadway.BroadwayMessageTest do
     user_id = Ecto.UUID.generate()
 
     # insere um webhook no banco para esse user_id
-    {:ok, webhook} = Webhooks.create_webhook_event(%{
-      user_id: user_id,
-      endpoint: "http://example.com/webhook"
-    })
+    {:ok, webhook} =
+      Webhooks.create_webhook_event(%{
+        user_id: user_id,
+        endpoint: "http://example.com/webhook"
+      })
 
     # retorna o user_id para o teste usar
     {:ok, user_id: user_id, webhook: webhook}
@@ -52,7 +53,7 @@ defmodule Notifications.Broadway.BroadwayMessageTest do
 
   describe "handle_batch/4" do
     test "calls ProcessMessage and logs batch size", %{user_id: user_id} do
-       mock(fn
+      mock(fn
         %Tesla.Env{method: :post} ->
           {:ok, %Tesla.Env{status: 200, body: %{"ok" => true}}}
       end)
@@ -73,6 +74,7 @@ defmodule Notifications.Broadway.BroadwayMessageTest do
         batch_key: :default,
         status: :ok
       }
+
       result = BroadwayMessage.handle_batch(:default, [message], %{}, %{})
 
       assert length(result) == 1

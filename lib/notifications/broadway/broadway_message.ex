@@ -40,9 +40,7 @@ defmodule Notifications.Broadway.BroadwayMessage do
   def handle_message(_, %Message{} = message, _) do
     with message <- Message.update_data(message, fn data -> Jason.decode!(data) end),
          {:ok, endpoint} <-
-           Webhooks.get_webhook_event_by_user(
-             message.data["user_id"]
-           ),
+           Webhooks.get_webhook_event_by_user(message.data["user_id"]),
          {:ok, message_update} <-
            update_message_endpoint(message, endpoint) do
       message_update

@@ -17,24 +17,21 @@ defmodule Notifications.Worker.WorkerMessage do
   @spec perform(Oban.Job.t()) ::
           {:error, :no_scheme | :not_send | :nxdomain} | {:ok, :success_send}
   @impl Oban.Worker
-  def perform(
-        %Oban.Job{
-          args:
-            %{
-              "user_id" => user_id,
-              "endpoint" => endpoint,
-              "event_type" => event_type
-            } = data,
-          attempt: attempt
-        }
-      ) do
+  def perform(%Oban.Job{
+        args:
+          %{
+            "user_id" => user_id,
+            "endpoint" => endpoint,
+            "event_type" => event_type
+          } = data,
+        attempt: attempt
+      }) do
     Logger.info(
       "Trying send message to #{endpoint}, from client: #{user_id} and event #{event_type} at attempt #{attempt}"
     )
 
     with {:ok, %Tesla.Env{status: status}} when status in @status <-
-             EndpointMessage.send_webhook(data, endpoint) do
-
+           EndpointMessage.send_webhook(data, endpoint) do
       Logger.info(
         "Success send message to #{endpoint} with status: #{status}, from client: #{user_id} and event #{event_type}, at attempt: #{attempt}"
       )

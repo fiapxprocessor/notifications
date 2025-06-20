@@ -11,7 +11,7 @@ defmodule Notifications.Persistence.WebhooksTest do
     }
 
     @update_attrs %{
-      endpoint: "https://example.com/updated",
+      endpoint: "https://example.com/updated"
     }
 
     @invalid_attrs %{endpoint: nil, event_type: nil}
@@ -41,6 +41,7 @@ defmodule Notifications.Persistence.WebhooksTest do
         endpoint: "https://example.com/webhook2",
         user_id: Ecto.UUID.generate()
       }
+
       assert {:ok, %Webhook{} = webhook} = Webhooks.create_webhook_event(valid_attrs)
       assert webhook.endpoint == valid_attrs.endpoint
     end
@@ -61,6 +62,7 @@ defmodule Notifications.Persistence.WebhooksTest do
 
     test "delete_webhook_event/1 deletes the webhook", %{webhook: webhook} do
       {:ok, _deleted} = Webhooks.delete_webhook_event(webhook)
+
       assert_raise Ecto.NoResultsError, fn ->
         Webhooks.get_webhook_event!(webhook.id)
       end

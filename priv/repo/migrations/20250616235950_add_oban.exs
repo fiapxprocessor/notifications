@@ -1,7 +1,7 @@
 defmodule Notifications.Repo.Migrations.AddOban do
   use Ecto.Migration
 
-   def up do
+  def up do
     Oban.Migration.up(version: 12)
   end
 
