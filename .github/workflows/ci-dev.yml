@@ -1,0 +1,130 @@
+name: Elixir CI & Deploy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  MIX_ENV: test
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Elixir Tests
+    strategy:
+      matrix:
+        otp: ["25.0.4"]
+        elixir: ["1.16.1"]
+
+    services:
+      mongo:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache deps
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/mix.lock') }}
+
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile project
+        run: mix compile --warnings-as-errors
+
+      - name: Check Formatting
+        run: mix format --check-formatted
+
+      - name: Run tests
+        run: mix test
+
+      - name: Run Coveralls (GitHub format)
+        run: mix coveralls
+
+  deploy_to_ec2:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: 25.0.4
+          elixir-version: 1.14.1
+
+      - name: Clean and setup build (sem cache!)
+        run: |
+          rm -rf deps _build
+          mix deps.get
+          mix deps.compile
+
+      - name: Verificar versão do MongoDB
+        run: mix deps | grep mongodb
+
+      - name: Build release
+        run: MIX_ENV=prod mix release
+
+      - name: Archive release
+        run: tar -czf client_admin.tar.gz -C _build/prod/rel/client_admin .
+
+      - name: Upload release to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "client_admin.tar.gz"
+          target: "~/app"
+
+      - name: Run release on EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/app
+            tar -xzf client_admin.tar.gz
+            export SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+            export PHX_HOST=${{ secrets.PHX_HOST }}
+            export PORT=4000
+            export PHX_SERVER=true
+            export MIX_ENV=prod
+            export MONGODB_URL=${{ secrets.MONGODB_URL }}
+
+            ./bin/client_admin stop || true
+            ./bin/client_admin daemon
