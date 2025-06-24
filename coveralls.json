@@ -1,0 +1,16 @@
+{
+    "skip_files": [
+        "lib/notifications.ex",
+        "lib/notifications/repo.ex",
+        "lib/notifications_web/components/layouts.ex",
+        "lib/notifications_web/gettext.ex",
+        "lib/notifications_web/endpoint.ex",
+        "lib/notifications_web/controllers/page_html.ex",
+        "lib/notifications/mailer.ex",
+        "lib/notifications_web/components/core_components.ex",
+        "lib/notifications_web/jsons/error_json.ex",
+        "lib/notifications_web/jsons/error_helpers.ex",
+        "lib/notifications_web/jsons/changeset_json.ex",
+        "lib/notifications_web/controllers/fallback_controller.ex"
+    ]
+}

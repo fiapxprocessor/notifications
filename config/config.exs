@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :notifications, Notifications.PromEx,
+  disabled: false,
+  manual_metrics_start_delay: :no_delay,
+  drop_metrics_groups: [],
+  ecto_repos: [Notifications.Repo],
+  grafana: [
+    host: "http://grafana:3000",
+    username: "admin",
+    password: "admin",
+    upload_dashboards_on_start: true
+  ],
+  metrics_server: :disabled
+
 config :notifications,
   ecto_repos: [Notifications.Repo],
   generators: [timestamp_type: :utc_datetime]
@@ -60,6 +73,17 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :kaffe,
+  producer: [
+    endpoints: [kafka: 29092],
+    topics: ["notifications"]
+  ]
+
+config :notifications, Oban,
+  engine: Oban.Engines.Basic,
+  queues: [default: 10],
+  repo: Notifications.Repo
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

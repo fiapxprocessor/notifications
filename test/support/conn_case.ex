@@ -23,6 +23,7 @@ defmodule NotificationsWeb.ConnCase do
       @endpoint NotificationsWeb.Endpoint
 
       use NotificationsWeb, :verified_routes
+      alias NotificationsWeb.Router.Helpers, as: Routes
 
       # Import conveniences for testing with connections
       import Plug.Conn

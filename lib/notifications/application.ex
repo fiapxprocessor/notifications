@@ -8,16 +8,19 @@ defmodule Notifications.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      Notifications.PromEx,
       NotificationsWeb.Telemetry,
       Notifications.Repo,
       {DNSCluster, query: Application.get_env(:notifications, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:notifications, Oban)},
       {Phoenix.PubSub, name: Notifications.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Notifications.Finch},
       # Start a worker by calling: Notifications.Worker.start_link(arg)
       # {Notifications.Worker, arg},
       # Start to serve requests, typically the last entry
-      NotificationsWeb.Endpoint
+      NotificationsWeb.Endpoint,
+      Notifications.Broadway.BroadwayMessage
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -9,7 +9,17 @@ defmodule Notifications.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [
+        tool: ExCoveralls,
+        minimum_coverage: 80
+      ],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.html": :test,
+        "coveralls.github": :test
+      ]
     ]
   end
 
@@ -57,7 +67,16 @@ defmodule Notifications.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:broadway, "~> 1.0"},
+      {:kaffe, "~> 1.0"},
+      {:broadway_kafka, "~> 0.4.1"},
+      {:oban, "~> 2.19"},
+      {:igniter, "~> 0.5", only: [:dev]},
+      {:tesla, "~> 1.11"},
+      {:excoveralls, "~> 0.18", only: [:test]},
+      {:mox, "~> 1.1", only: :test},
+      {:prom_ex, "~> 1.11.0"}
     ]
   end
 

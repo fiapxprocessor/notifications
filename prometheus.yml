@@ -1,0 +1,22 @@
+# my global config
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["prometheus:9090"]
+
+  - job_name: notifications_app
+    scrape_interval: 5s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["app:4001"]
+
+  - job_name: fiapx_app
+    scrape_interval: 5s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["app:4000"]
