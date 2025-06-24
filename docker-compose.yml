@@ -28,6 +28,31 @@ services:
     networks:
       - shared_net
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus-custom.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus-custom.yml:ro
+    networks:
+      - shared_net
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    user: "472"
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana/data:/var/lib/grafana/data
+    depends_on:
+      - prometheus
+    networks:
+      - shared_net
+
 volumes:
   pgdata_notifications:
   pgdata:       

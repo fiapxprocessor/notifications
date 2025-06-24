@@ -25,6 +25,8 @@ defmodule NotificationsWeb.Endpoint do
     gzip: false,
     only: NotificationsWeb.static_paths()
 
+  plug PromEx.Plug, prom_ex_module: Notifications.PromEx
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

@@ -8,6 +8,7 @@ defmodule Notifications.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      Notifications.PromEx,
       NotificationsWeb.Telemetry,
       Notifications.Repo,
       {DNSCluster, query: Application.get_env(:notifications, :dns_cluster_query) || :ignore},

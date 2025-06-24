@@ -25,6 +25,7 @@ defmodule NotificationsWeb.Router do
 
     post "/webhooks", WebhooksController, :create
     get "/webhooks", WebhooksController, :index
+    delete "/webhooks/:user_id", WebhooksController, :delete
   end
 
   # Other scopes may use custom stacks.

@@ -75,7 +75,8 @@ defmodule Notifications.MixProject do
       {:igniter, "~> 0.5", only: [:dev]},
       {:tesla, "~> 1.11"},
       {:excoveralls, "~> 0.18", only: [:test]},
-      {:mox, "~> 1.1", only: :test}
+      {:mox, "~> 1.1", only: :test},
+      {:prom_ex, "~> 1.11.0"}
     ]
   end
 

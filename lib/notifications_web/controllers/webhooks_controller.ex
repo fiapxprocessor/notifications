@@ -26,4 +26,13 @@ defmodule NotificationsWeb.WebhooksController do
 
     render(conn, "index.json", webhooks: webhooks)
   end
+
+  def delete(conn, %{"user_id" => user_id}) do
+    with {:ok, %Webhook{} = webhook_event} <- WebhooksControl.get_webhook_event_by_user(user_id),
+         {:ok, _} <- WebhooksControl.delete_webhook_event(webhook_event) do
+      conn
+      |> put_status(:ok)
+      |> render("show.json", webhook_event: webhook_event)
+    end
+  end
 end
